@@ -95,7 +95,10 @@ echo_details "* output_tool: $output_tool"
 echo_details "* xcodebuild_options: $xcodebuild_options"
 echo_details "* is_export_xcarchive_zip: $is_export_xcarchive_zip"
 echo_details "* use_deprecated_export: $use_deprecated_export"
-
+echo_details "* use_ssh_for_archive: $use_ssh_for_archive"
+echo_details "* keychain_path: $keychain_path"
+echo_details "* keychain_password: ***"
+echo_details "* ssh_identity_path: $ssh_identity_path"
 echo
 
 validate_required_input "project_path" $project_path
@@ -235,7 +238,15 @@ if [[ "${output_tool}" == "xcpretty" ]] ; then
 	archive_cmd="set -o pipefail && $archive_cmd | xcpretty"
 fi
 
-echo_details "$ $archive_cmd"
+display_cmd=$archive_cmd
+
+if [[ "${use_ssh_for_archive}" == "yes" ]] ; then
+	echo_info "Using a new self-connected ssh session to execute the archiving and code signing ..."
+	archive_cmd="ssh -i ${ssh_identity_path} 127.0.0.1 cd $(pwd) && security unlock-keychain -p ${keychain_password} ${keychain_path} && $archive_cmd"
+	display_cmd="ssh -i ${ssh_identity_path} 127.0.0.1 cd $(pwd) && security unlock-keychain -p *** ${keychain_path} && $archive_cmd"
+fi
+
+echo_details "$ $display_cmd"
 echo
 
 eval $archive_cmd

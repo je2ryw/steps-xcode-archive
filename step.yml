@@ -160,6 +160,31 @@ inputs:
       - "yes"
       - "no"
       is_required: true
+  - use_ssh_for_archive: "no"
+    opts:
+      title: Use a new ssh session for archiving and code signing task?
+      description: |
+        If this input is set to `yes`, the archiving and code signing tasks will executed via a self-connected ssh session.
+        It is a workaround solution for the keychain unlock prompt issue at the code signing step.
+      value_options:
+      - "yes"
+      - "no"
+      is_required: false
+  - keychain_path: $HOME/Library/Keychains/login.keychain
+    opts:
+      title: Keychain Path
+      is_required: false
+  - keychain_password: $BITRISE_KEYCHAIN_PASSWORD
+    opts:
+      title: Keychain's password
+      is_required: false
+  - ssh_identity_path: "~/.ssh/vagrant-insecure_private_key"
+    opts:
+      title: "Identity file path for the ssh session"
+      summary: ""
+      description: |
+        Execute the xcodebuild archive command via a self-connected ssh session.
+      is_required: false
 outputs:
   - BITRISE_IPA_PATH:
     opts:
